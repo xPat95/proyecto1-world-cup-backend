@@ -76,6 +76,30 @@ Ejecutar el esquema dentro del contenedor de PostgreSQL:
 docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/schema.sql
 ```
 
+## Conexion con PostgreSQL
+
+El backend usa `pg` para conectarse a PostgreSQL. Las credenciales se leen desde variables de entorno, por lo que se debe crear un archivo `.env` local basado en `.env.example`.
+
+Levantar la base de datos y el backend:
+
+```bash
+npm install
+docker compose up -d
+npm run dev
+```
+
+Probar que la API responde:
+
+```text
+http://localhost:3000/ping
+```
+
+Probar la conexion con PostgreSQL:
+
+```text
+http://localhost:3000/ping/db
+```
+
 ## Endpoint disponible
 
 ```http

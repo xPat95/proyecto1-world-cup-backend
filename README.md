@@ -179,3 +179,33 @@ El campo `quantity` define el estado visual de la estampilla:
 - Mayor a `1`: repetida
 
 Para consultar datos, primero debe existir la tabla `stickers` en PostgreSQL. Puedes cargar datos de prueba con `src/db/seed.sql`.
+
+## Busqueda, filtros, ordenamiento y paginacion
+
+`GET /stickers` soporta parametros para buscar, filtrar, ordenar y paginar resultados.
+
+Ejemplos:
+
+```http
+GET /stickers?q=messi
+GET /stickers?country=Argentina
+GET /stickers?status=missing
+GET /stickers?status=owned
+GET /stickers?status=duplicate
+GET /stickers?sort=player_name&order=asc
+GET /stickers?page=1&limit=10
+```
+
+`q` busca coincidencias en numero de estampilla, jugador, pais y posicion.
+
+`country` filtra por pais o seleccion.
+
+`status` se calcula a partir de `quantity`:
+
+- `missing`: `quantity = 0`
+- `owned`: `quantity = 1`
+- `duplicate`: `quantity > 1`
+
+`sort` y `order` controlan el orden de los resultados.
+
+`page` y `limit` controlan la paginacion.

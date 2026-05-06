@@ -68,17 +68,95 @@ function validateStickerData(body) {
   };
 }
 
+function validateGetStickersQuery(query) {
+  const allowedStatuses = ['missing', 'owned', 'duplicate'];
+  const allowedSortFields = [
+    'id',
+    'sticker_number',
+    'player_name',
+    'country',
+    'position',
+    'quantity',
+    'created_at',
+    'updated_at',
+  ];
+  const allowedOrders = ['asc', 'desc'];
+
+  const status = query.status ? String(query.status).toLowerCase() : undefined;
+  const sort = query.sort ? String(query.sort).toLowerCase() : 'id';
+  const order = query.order ? String(query.order).toLowerCase() : 'asc';
+  const page = query.page === undefined ? 1 : Number(query.page);
+  const limit = query.limit === undefined ? 10 : Number(query.limit);
+
+  if (status && !allowedStatuses.includes(status)) {
+    return {
+      error: 'El estado debe ser missing, owned o duplicate',
+    };
+  }
+
+  if (!allowedSortFields.includes(sort)) {
+    return {
+      error: 'El campo de ordenamiento no es válido',
+    };
+  }
+
+  if (!allowedOrders.includes(order)) {
+    return {
+      error: 'El orden debe ser asc o desc',
+    };
+  }
+
+  if (!Number.isInteger(page) || page <= 0) {
+    return {
+      error: 'La página debe ser un número entero positivo',
+    };
+  }
+
+  if (!Number.isInteger(limit) || limit <= 0) {
+    return {
+      error: 'El límite debe ser un número entero positivo',
+    };
+  }
+
+  if (limit > 50) {
+    return {
+      error: 'El límite máximo permitido es 50',
+    };
+  }
+
+  return {
+    data: {
+      q: query.q ? String(query.q).trim() : undefined,
+      country: query.country ? String(query.country).trim() : undefined,
+      status,
+      sort,
+      order,
+      page,
+      limit,
+    },
+  };
+}
+
 async function getStickers(req, res) {
   try {
-    const stickers = await getAllStickers();
+    const validation = validateGetStickersQuery(req.query);
 
-    res.status(200).json({
-      data: stickers,
+    if (validation.error) {
+      return res.status(400).json({
+        error: validation.error,
+      });
+    }
+
+    const stickers = await getAllStickers(validation.data);
+
+    return res.status(200).json({
+      data: stickers.data,
+      pagination: stickers.pagination,
     });
   } catch (error) {
     console.error('Error getting stickers:', error);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Error interno del servidor',
     });
   }

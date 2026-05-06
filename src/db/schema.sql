@@ -1,0 +1,1 @@
+-- Aqui se agregara mas adelante la tabla stickers y el esquema de la base de datos.

@@ -2,7 +2,71 @@ const {
   getAllStickers,
   getStickerById,
   createSticker: createStickerModel,
+  updateSticker: updateStickerModel,
+  deleteSticker: deleteStickerModel,
 } = require('../models/stickers.model');
+
+function parsePositiveId(idParam) {
+  const id = Number(idParam);
+
+  if (!Number.isInteger(id) || id <= 0) {
+    return null;
+  }
+
+  return id;
+}
+
+function validateStickerData(body) {
+  const {
+    sticker_number,
+    player_name,
+    country,
+    position,
+    notes,
+  } = body;
+
+  const quantity = body.quantity === undefined ? 0 : body.quantity;
+  const parsedQuantity = Number(quantity);
+
+  if (!sticker_number || !String(sticker_number).trim()) {
+    return {
+      error: 'El número de estampilla es obligatorio',
+    };
+  }
+
+  if (!player_name || !String(player_name).trim()) {
+    return {
+      error: 'El nombre del jugador es obligatorio',
+    };
+  }
+
+  if (!country || !String(country).trim()) {
+    return {
+      error: 'La selección o país es obligatorio',
+    };
+  }
+
+  if (
+    (typeof quantity === 'string' && !quantity.trim())
+    || !Number.isInteger(parsedQuantity)
+    || parsedQuantity < 0
+  ) {
+    return {
+      error: 'La cantidad debe ser un número entero mayor o igual a 0',
+    };
+  }
+
+  return {
+    data: {
+      sticker_number: String(sticker_number).trim(),
+      player_name: String(player_name).trim(),
+      country: String(country).trim(),
+      position: position ?? null,
+      quantity: parsedQuantity,
+      notes: notes ?? null,
+    },
+  };
+}
 
 async function getStickers(req, res) {
   try {
@@ -22,9 +86,9 @@ async function getStickers(req, res) {
 
 async function getSticker(req, res) {
   try {
-    const id = Number(req.params.id);
+    const id = parsePositiveId(req.params.id);
 
-    if (!Number.isInteger(id) || id <= 0) {
+    if (!id) {
       return res.status(400).json({
         error: 'El id de la estampilla debe ser un número válido',
       });
@@ -52,53 +116,15 @@ async function getSticker(req, res) {
 
 async function createSticker(req, res) {
   try {
-    const {
-      sticker_number,
-      player_name,
-      country,
-      position,
-      notes,
-    } = req.body;
+    const validation = validateStickerData(req.body);
 
-    const quantity = req.body.quantity === undefined ? 0 : req.body.quantity;
-    const parsedQuantity = Number(quantity);
-
-    if (!sticker_number || !String(sticker_number).trim()) {
+    if (validation.error) {
       return res.status(400).json({
-        error: 'El número de estampilla es obligatorio',
+        error: validation.error,
       });
     }
 
-    if (!player_name || !String(player_name).trim()) {
-      return res.status(400).json({
-        error: 'El nombre del jugador es obligatorio',
-      });
-    }
-
-    if (!country || !String(country).trim()) {
-      return res.status(400).json({
-        error: 'La selección o país es obligatorio',
-      });
-    }
-
-    if (
-      (typeof quantity === 'string' && !quantity.trim())
-      || !Number.isInteger(parsedQuantity)
-      || parsedQuantity < 0
-    ) {
-      return res.status(400).json({
-        error: 'La cantidad debe ser un número entero mayor o igual a 0',
-      });
-    }
-
-    const newSticker = await createStickerModel({
-      sticker_number: String(sticker_number).trim(),
-      player_name: String(player_name).trim(),
-      country: String(country).trim(),
-      position: position ?? null,
-      quantity: parsedQuantity,
-      notes: notes ?? null,
-    });
+    const newSticker = await createStickerModel(validation.data);
 
     return res.status(201).json({
       data: newSticker,
@@ -112,8 +138,76 @@ async function createSticker(req, res) {
   }
 }
 
+async function updateSticker(req, res) {
+  try {
+    const id = parsePositiveId(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({
+        error: 'El id de la estampilla debe ser un número válido',
+      });
+    }
+
+    const validation = validateStickerData(req.body);
+
+    if (validation.error) {
+      return res.status(400).json({
+        error: validation.error,
+      });
+    }
+
+    const updatedSticker = await updateStickerModel(id, validation.data);
+
+    if (!updatedSticker) {
+      return res.status(404).json({
+        error: 'Estampilla no encontrada',
+      });
+    }
+
+    return res.status(200).json({
+      data: updatedSticker,
+    });
+  } catch (error) {
+    console.error('Error updating sticker:', error);
+
+    return res.status(500).json({
+      error: 'Error interno del servidor',
+    });
+  }
+}
+
+async function deleteSticker(req, res) {
+  try {
+    const id = parsePositiveId(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({
+        error: 'El id de la estampilla debe ser un número válido',
+      });
+    }
+
+    const deletedSticker = await deleteStickerModel(id);
+
+    if (!deletedSticker) {
+      return res.status(404).json({
+        error: 'Estampilla no encontrada',
+      });
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting sticker:', error);
+
+    return res.status(500).json({
+      error: 'Error interno del servidor',
+    });
+  }
+}
+
 module.exports = {
   getStickers,
   getSticker,
   createSticker,
+  updateSticker,
+  deleteSticker,
 };

@@ -116,12 +116,14 @@ Respuesta esperada:
 
 ## Endpoints de estampillas disponibles
 
-Actualmente hay endpoints para consultar y crear estampillas.
+Actualmente hay endpoints para consultar, crear, editar y eliminar estampillas.
 
 ```http
 GET /stickers
 GET /stickers/:id
 POST /stickers
+PUT /stickers/:id
+DELETE /stickers/:id
 ```
 
 Ejemplo de body JSON para crear una estampilla:
@@ -136,6 +138,25 @@ Ejemplo de body JSON para crear una estampilla:
   "notes": "Primera estampilla registrada"
 }
 ```
+
+Ejemplo de body JSON para editar una estampilla:
+
+```json
+{
+  "sticker_number": "ARG-10",
+  "player_name": "Lionel Messi",
+  "country": "Argentina",
+  "position": "Delantero",
+  "quantity": 2,
+  "notes": "Repetida para intercambio"
+}
+```
+
+`PUT /stickers/:id` devuelve `200` con la estampilla actualizada.
+
+`DELETE /stickers/:id` devuelve `204` sin body si la estampilla se elimina correctamente.
+
+Si la estampilla no existe, `PUT /stickers/:id` y `DELETE /stickers/:id` devuelven `404`.
 
 El campo `quantity` define el estado visual de la estampilla:
 

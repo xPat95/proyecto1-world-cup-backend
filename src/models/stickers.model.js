@@ -39,8 +39,47 @@ async function createSticker(stickerData) {
   return result.rows[0];
 }
 
+async function updateSticker(id, stickerData) {
+  const {
+    sticker_number,
+    player_name,
+    country,
+    position,
+    quantity,
+    notes,
+  } = stickerData;
+
+  const result = await pool.query(
+    `UPDATE stickers
+    SET
+      sticker_number = $1,
+      player_name = $2,
+      country = $3,
+      position = $4,
+      quantity = $5,
+      notes = $6,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE id = $7
+    RETURNING *;`,
+    [sticker_number, player_name, country, position, quantity, notes, id],
+  );
+
+  return result.rows[0];
+}
+
+async function deleteSticker(id) {
+  const result = await pool.query(
+    'DELETE FROM stickers WHERE id = $1 RETURNING *;',
+    [id],
+  );
+
+  return result.rows[0];
+}
+
 module.exports = {
   getAllStickers,
   getStickerById,
   createSticker,
+  updateSticker,
+  deleteSticker,
 };

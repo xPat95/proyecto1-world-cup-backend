@@ -1,2 +1,15 @@
-// Configuracion futura de la aplicacion Express.
-// Aqui se registraran middlewares y rutas de la API.
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+app.get('/ping', (req, res) => {
+  res.json({
+    message: 'pong',
+  });
+});
+
+module.exports = app;

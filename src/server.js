@@ -1,2 +1,9 @@
-// Punto de entrada futuro del servidor Express.
-// Aqui se iniciara la aplicacion y se configurara el puerto.
+require('dotenv/config');
+
+const app = require('./app');
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`World Cup Sticker Tracker API running on port ${PORT}`);
+});

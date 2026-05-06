@@ -6,5 +6,38 @@ Este repositorio contendra el backend del proyecto, construido con Node.js, Expr
 
 ## Estado actual
 
-Este commit contiene unicamente la estructura inicial de carpetas y archivos placeholder.
-Todavia no hay conexion real a base de datos, endpoints funcionales ni logica de CRUD.
+Este commit inicializa el backend con Node.js y Express, y agrega un endpoint de prueba para verificar que la API responde.
+
+Todavia no hay conexion real a base de datos, endpoints de estampillas ni logica de CRUD.
+
+## Instalacion
+
+```bash
+npm install
+```
+
+## Modo desarrollo
+
+```bash
+npm run dev
+```
+
+## Modo produccion
+
+```bash
+npm start
+```
+
+## Endpoint disponible
+
+```http
+GET /ping
+```
+
+Respuesta esperada:
+
+```json
+{
+  "message": "pong"
+}
+```

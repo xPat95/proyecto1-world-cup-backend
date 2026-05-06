@@ -76,6 +76,20 @@ Ejecutar el esquema dentro del contenedor de PostgreSQL:
 docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/schema.sql
 ```
 
+## Datos iniciales
+
+El archivo `src/db/seed.sql` contiene datos de prueba para probar el CRUD y los futuros filtros.
+
+Este seed reinicia la tabla usando `TRUNCATE`, por lo que elimina los datos actuales de desarrollo antes de insertar los registros iniciales.
+
+Ejecutar base de datos, esquema y seed:
+
+```bash
+docker compose up -d
+docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/schema.sql
+docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/seed.sql
+```
+
 ## Conexion con PostgreSQL
 
 El backend usa `pg` para conectarse a PostgreSQL. Las credenciales se leen desde variables de entorno, por lo que se debe crear un archivo `.env` local basado en `.env.example`.
@@ -164,4 +178,4 @@ El campo `quantity` define el estado visual de la estampilla:
 - `1`: conseguida
 - Mayor a `1`: repetida
 
-Para consultar datos, primero debe existir la tabla `stickers` en PostgreSQL. El seed data se agregara en un commit posterior.
+Para consultar datos, primero debe existir la tabla `stickers` en PostgreSQL. Puedes cargar datos de prueba con `src/db/seed.sql`.

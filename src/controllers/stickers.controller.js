@@ -1,6 +1,7 @@
 const {
   getAllStickers,
   getStickerById,
+  createSticker: createStickerModel,
 } = require('../models/stickers.model');
 
 async function getStickers(req, res) {
@@ -49,7 +50,70 @@ async function getSticker(req, res) {
   }
 }
 
+async function createSticker(req, res) {
+  try {
+    const {
+      sticker_number,
+      player_name,
+      country,
+      position,
+      notes,
+    } = req.body;
+
+    const quantity = req.body.quantity === undefined ? 0 : req.body.quantity;
+    const parsedQuantity = Number(quantity);
+
+    if (!sticker_number || !String(sticker_number).trim()) {
+      return res.status(400).json({
+        error: 'El número de estampilla es obligatorio',
+      });
+    }
+
+    if (!player_name || !String(player_name).trim()) {
+      return res.status(400).json({
+        error: 'El nombre del jugador es obligatorio',
+      });
+    }
+
+    if (!country || !String(country).trim()) {
+      return res.status(400).json({
+        error: 'La selección o país es obligatorio',
+      });
+    }
+
+    if (
+      (typeof quantity === 'string' && !quantity.trim())
+      || !Number.isInteger(parsedQuantity)
+      || parsedQuantity < 0
+    ) {
+      return res.status(400).json({
+        error: 'La cantidad debe ser un número entero mayor o igual a 0',
+      });
+    }
+
+    const newSticker = await createStickerModel({
+      sticker_number: String(sticker_number).trim(),
+      player_name: String(player_name).trim(),
+      country: String(country).trim(),
+      position: position ?? null,
+      quantity: parsedQuantity,
+      notes: notes ?? null,
+    });
+
+    return res.status(201).json({
+      data: newSticker,
+    });
+  } catch (error) {
+    console.error('Error creating sticker:', error);
+
+    return res.status(500).json({
+      error: 'Error interno del servidor',
+    });
+  }
+}
+
 module.exports = {
   getStickers,
   getSticker,
+  createSticker,
 };

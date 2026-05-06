@@ -116,13 +116,31 @@ Respuesta esperada:
 
 ## Endpoints de estampillas disponibles
 
-En este commit se agregaron solamente endpoints de lectura para estampillas.
+Actualmente hay endpoints para consultar y crear estampillas.
 
 ```http
 GET /stickers
 GET /stickers/:id
+POST /stickers
 ```
 
-Para ver datos, primero debe existir la tabla `stickers` en PostgreSQL y debe tener registros guardados.
+Ejemplo de body JSON para crear una estampilla:
 
-El seed data se agregara en un commit posterior.
+```json
+{
+  "sticker_number": "ARG-10",
+  "player_name": "Lionel Messi",
+  "country": "Argentina",
+  "position": "Delantero",
+  "quantity": 1,
+  "notes": "Primera estampilla registrada"
+}
+```
+
+El campo `quantity` define el estado visual de la estampilla:
+
+- `0`: faltante
+- `1`: conseguida
+- Mayor a `1`: repetida
+
+Para consultar datos, primero debe existir la tabla `stickers` en PostgreSQL. El seed data se agregara en un commit posterior.

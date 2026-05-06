@@ -1,11 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const { testConnection } = require('./db/connection');
+const stickersRoutes = require('./routes/stickers.routes');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+app.use('/stickers', stickersRoutes);
 
 app.get('/ping', (req, res) => {
   res.json({

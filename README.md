@@ -113,3 +113,16 @@ Respuesta esperada:
   "message": "pong"
 }
 ```
+
+## Endpoints de estampillas disponibles
+
+En este commit se agregaron solamente endpoints de lectura para estampillas.
+
+```http
+GET /stickers
+GET /stickers/:id
+```
+
+Para ver datos, primero debe existir la tabla `stickers` en PostgreSQL y debe tener registros guardados.
+
+El seed data se agregara en un commit posterior.

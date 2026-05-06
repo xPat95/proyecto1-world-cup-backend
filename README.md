@@ -58,6 +58,24 @@ Datos de conexion:
 - Usuario: `postgres`
 - Contrasena: `postgres`
 
+## Esquema de base de datos
+
+La tabla principal sera `stickers`. Esta tabla guardara la informacion basica de cada estampilla: numero, nombre, pais, posicion, cantidad y notas.
+
+El campo `quantity` define el estado de la estampilla:
+
+- `0`: faltante
+- `1`: conseguida
+- Mayor a `1`: repetida
+
+El script del esquema se encuentra en `src/db/schema.sql`.
+
+Ejecutar el esquema dentro del contenedor de PostgreSQL:
+
+```bash
+docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/schema.sql
+```
+
 ## Endpoint disponible
 
 ```http

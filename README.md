@@ -94,6 +94,12 @@ docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < sr
 
 El backend usa `pg` para conectarse a PostgreSQL. Las credenciales se leen desde variables de entorno, por lo que se debe crear un archivo `.env` local basado en `.env.example`.
 
+Ejemplo:
+
+```bash
+copy .env.example .env
+```
+
 Levantar la base de datos y el backend:
 
 ```bash

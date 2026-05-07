@@ -12,64 +12,65 @@ SELECT
   'FWC' AS country,
   'Especial' AS position,
   CASE
-    WHEN number IN (1, 5, 9, 13, 17) THEN 0
+    WHEN number IN (0, 4, 8, 12, 16) THEN 0
     WHEN number IN (2, 6, 10, 14, 18) THEN 2
+    WHEN number = 19 THEN 3
     ELSE 1
   END AS quantity,
-  'Seccion especial del album' AS notes
+  'Sección especial del álbum' AS notes
 FROM generate_series(0, 19) AS number;
 
 -- Selecciones del album: cada seleccion tiene codigos 01 a 20.
-WITH teams(code, name) AS (
+WITH teams(name, code) AS (
   VALUES
-    ('MEX', 'Mexico'),
-    ('RSA', 'Sudafrica'),
-    ('KOR', 'Corea del Sur'),
-    ('CZE', 'Republica Checa'),
-    ('CAN', 'Canada'),
-    ('BIH', 'Bosnia y Herzegovina'),
-    ('QAT', 'Qatar'),
-    ('SUI', 'Suiza'),
-    ('BRA', 'Brasil'),
-    ('MAR', 'Marruecos'),
-    ('HAI', 'Haiti'),
-    ('SCO', 'Escocia'),
-    ('USA', 'Estados Unidos'),
-    ('PAR', 'Paraguay'),
-    ('AUS', 'Australia'),
-    ('TUR', 'Turquia'),
-    ('GER', 'Alemania'),
-    ('CUW', 'Curazao'),
-    ('CIV', 'Costa de Marfil'),
-    ('ECU', 'Ecuador'),
-    ('NED', 'Paises Bajos'),
-    ('JPN', 'Japon'),
-    ('SWE', 'Suecia'),
-    ('TUN', 'Tunez'),
-    ('BEL', 'Belgica'),
-    ('EGY', 'Egipto'),
-    ('IRN', 'Iran'),
-    ('NZL', 'Nueva Zelanda'),
-    ('ESP', 'Espana'),
-    ('CPV', 'Cabo Verde'),
-    ('KSA', 'Arabia Saudita'),
-    ('URU', 'Uruguay'),
-    ('FRA', 'Francia'),
-    ('SEN', 'Senegal'),
-    ('IRQ', 'Irak'),
-    ('NOR', 'Noruega'),
-    ('ARG', 'Argentina'),
-    ('ALG', 'Argelia'),
-    ('AUT', 'Austria'),
-    ('JOR', 'Jordania'),
-    ('POR', 'Portugal'),
-    ('COD', 'RD Congo'),
-    ('UZB', 'Uzbekistan'),
-    ('COL', 'Colombia'),
-    ('ENG', 'Inglaterra'),
-    ('CRO', 'Croacia'),
-    ('GHA', 'Ghana'),
-    ('PAN', 'Panama')
+    ('México', 'MEX'),
+    ('Sudáfrica', 'RSA'),
+    ('Corea del Sur', 'KOR'),
+    ('República Checa', 'CZE'),
+    ('Canadá', 'CAN'),
+    ('Bosnia y Herzegovina', 'BIH'),
+    ('Qatar', 'QAT'),
+    ('Suiza', 'SUI'),
+    ('Brasil', 'BRA'),
+    ('Marruecos', 'MAR'),
+    ('Haití', 'HAI'),
+    ('Escocia', 'SCO'),
+    ('Estados Unidos', 'USA'),
+    ('Paraguay', 'PAR'),
+    ('Australia', 'AUS'),
+    ('Turquía', 'TUR'),
+    ('Alemania', 'GER'),
+    ('Curazao', 'CUW'),
+    ('Costa de Marfil', 'CIV'),
+    ('Ecuador', 'ECU'),
+    ('Países Bajos', 'NED'),
+    ('Japón', 'JPN'),
+    ('Suecia', 'SWE'),
+    ('Túnez', 'TUN'),
+    ('Bélgica', 'BEL'),
+    ('Egipto', 'EGY'),
+    ('Irán', 'IRN'),
+    ('Nueva Zelanda', 'NZL'),
+    ('España', 'ESP'),
+    ('Cabo Verde', 'CPV'),
+    ('Arabia Saudita', 'KSA'),
+    ('Uruguay', 'URU'),
+    ('Francia', 'FRA'),
+    ('Senegal', 'SEN'),
+    ('Irak', 'IRQ'),
+    ('Noruega', 'NOR'),
+    ('Argentina', 'ARG'),
+    ('Argelia', 'ALG'),
+    ('Austria', 'AUT'),
+    ('Jordania', 'JOR'),
+    ('Portugal', 'POR'),
+    ('RD Congo', 'COD'),
+    ('Uzbekistán', 'UZB'),
+    ('Colombia', 'COL'),
+    ('Inglaterra', 'ENG'),
+    ('Croacia', 'CRO'),
+    ('Ghana', 'GHA'),
+    ('Panamá', 'PAN')
 ),
 numbers AS (
   SELECT generate_series(1, 20) AS number
@@ -89,3 +90,9 @@ SELECT
 FROM teams
 CROSS JOIN numbers
 ORDER BY teams.code, numbers.number;
+
+SELECT COUNT(*) AS total_stickers FROM stickers;
+
+-- Consultas opcionales de verificacion:
+-- SELECT * FROM stickers WHERE country = 'FWC';
+-- SELECT * FROM stickers WHERE country = 'MEX';

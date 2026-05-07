@@ -93,6 +93,29 @@ async function getStickerById(id) {
   return result.rows[0];
 }
 
+async function getStickerStats() {
+  const result = await pool.query(
+    `SELECT
+      COUNT(*)::INTEGER AS total,
+      COUNT(*) FILTER (WHERE quantity >= 1)::INTEGER AS owned,
+      COUNT(*) FILTER (WHERE quantity = 0)::INTEGER AS missing,
+      COUNT(*) FILTER (WHERE quantity > 1)::INTEGER AS duplicate
+    FROM stickers;`,
+  );
+
+  const stats = result.rows[0];
+  const total = Number(stats.total);
+  const owned = Number(stats.owned);
+
+  return {
+    total,
+    owned,
+    missing: Number(stats.missing),
+    duplicate: Number(stats.duplicate),
+    progress: total > 0 ? Math.round((owned / total) * 100) : 0,
+  };
+}
+
 async function createSticker(stickerData) {
   const {
     sticker_number,
@@ -160,6 +183,7 @@ async function deleteSticker(id) {
 module.exports = {
   getAllStickers,
   getStickerById,
+  getStickerStats,
   createSticker,
   updateSticker,
   deleteSticker,

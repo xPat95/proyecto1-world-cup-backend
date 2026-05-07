@@ -1,6 +1,7 @@
 const {
   getAllStickers,
   getStickerById,
+  getStickerStats: getStickerStatsModel,
   createSticker: createStickerModel,
   updateSticker: updateStickerModel,
   deleteSticker: deleteStickerModel,
@@ -192,6 +193,22 @@ async function getSticker(req, res) {
   }
 }
 
+async function getStickerStats(req, res) {
+  try {
+    const stats = await getStickerStatsModel();
+
+    return res.status(200).json({
+      data: stats,
+    });
+  } catch (error) {
+    console.error('Error getting sticker stats:', error);
+
+    return res.status(500).json({
+      error: 'Error interno del servidor',
+    });
+  }
+}
+
 async function createSticker(req, res) {
   try {
     const validation = validateStickerData(req.body);
@@ -285,6 +302,7 @@ async function deleteSticker(req, res) {
 module.exports = {
   getStickers,
   getSticker,
+  getStickerStats,
   createSticker,
   updateSticker,
   deleteSticker,

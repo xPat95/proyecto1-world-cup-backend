@@ -164,6 +164,7 @@ Actualmente hay endpoints para consultar, crear, editar y eliminar estampillas.
 
 ```http
 GET /stickers
+GET /stickers/stats
 GET /stickers/:id
 POST /stickers
 PUT /stickers/:id
@@ -207,6 +208,15 @@ El campo `quantity` define el estado visual de la estampilla:
 - `0`: faltante
 - `1`: conseguida
 - Mayor a `1`: repetida
+
+`GET /stickers/stats` devuelve las estadisticas globales del album completo y no depende de la pagina actual, busqueda ni filtros usados en `GET /stickers`.
+
+Para estas estadisticas:
+
+- Conseguidas = `quantity >= 1`
+- Faltantes = `quantity = 0`
+- Repetidas = `quantity > 1`
+- Las repetidas tambien cuentan como conseguidas.
 
 Para consultar datos, primero debe existir la tabla `stickers` en PostgreSQL. Puedes cargar datos de prueba con `src/db/seed.sql`.
 

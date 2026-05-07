@@ -6,9 +6,9 @@ Este repositorio contendra el backend del proyecto, construido con Node.js, Expr
 
 ## Estado actual
 
-Este commit inicializa el backend con Node.js y Express, y agrega un endpoint de prueba para verificar que la API responde.
+El backend ya cuenta con Express, conexion a PostgreSQL usando `pg`, Docker Compose para levantar la base de datos y CRUD completo de estampillas.
 
-Todavia no hay conexion real a base de datos, endpoints de estampillas ni logica de CRUD.
+Tambien incluye busqueda, filtros, ordenamiento y paginacion para `GET /stickers`.
 
 ## Instalacion
 
@@ -126,6 +126,12 @@ Respuesta esperada:
 {
   "message": "pong"
 }
+```
+
+Tambien existe un endpoint para probar la conexion con PostgreSQL:
+
+```http
+GET /ping/db
 ```
 
 ## Endpoints de estampillas disponibles

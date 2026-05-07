@@ -1,5 +1,7 @@
 -- Script inicial para la base de datos del tracker de estampillas.
 -- La tabla stickers representa cada estampilla del album del Mundial.
+-- sticker_number guarda el codigo del album, por ejemplo FWC00, MEX01 o ARG20.
+-- player_name se conserva por compatibilidad con el CRUD y puede usarse como referencia o descripcion.
 -- Interpretacion de quantity:
 -- 0 = faltante, 1 = conseguida, mayor a 1 = repetida.
 

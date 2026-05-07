@@ -78,7 +78,7 @@ docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < sr
 
 ## Datos iniciales
 
-El archivo `src/db/seed.sql` contiene datos de prueba para probar el CRUD y los futuros filtros.
+El archivo `src/db/seed.sql` contiene datos de prueba para probar el CRUD, los filtros y el render visual por codigos de album.
 
 Este seed reinicia la tabla usando `TRUNCATE`, por lo que elimina los datos actuales de desarrollo antes de insertar los registros iniciales.
 
@@ -89,6 +89,24 @@ docker compose up -d
 docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/schema.sql
 docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/seed.sql
 ```
+
+## Datos del album
+
+El album usa codigos de estampilla como identificador principal.
+
+- La seccion especial usa codigos `FWC00` a `FWC19`.
+- Las selecciones usan codigo de tres letras mas numero de dos digitos.
+- Ejemplos: `MEX01`, `ARG10`, `BRA20`.
+- Cada seleccion tiene estampillas del `01` al `20`.
+- El seed genera `20` estampillas FWC y `960` estampillas de selecciones, para un total de `980` registros.
+
+El campo `quantity` define el estado:
+
+- `0`: faltante
+- `1`: conseguida
+- Mayor a `1`: repetida
+
+El campo `player_name` se mantiene por compatibilidad con el CRUD, pero en el seed se usa como referencia generica, por ejemplo `Estampilla MEX 01`.
 
 ## Conexion con PostgreSQL
 
@@ -156,12 +174,12 @@ Ejemplo de body JSON para crear una estampilla:
 
 ```json
 {
-  "sticker_number": "ARG-10",
-  "player_name": "Lionel Messi",
-  "country": "Argentina",
-  "position": "Delantero",
+  "sticker_number": "ARG10",
+  "player_name": "Estampilla ARG 10",
+  "country": "ARG",
+  "position": "Seleccion",
   "quantity": 1,
-  "notes": "Primera estampilla registrada"
+  "notes": "Estampilla de Argentina"
 }
 ```
 
@@ -169,10 +187,10 @@ Ejemplo de body JSON para editar una estampilla:
 
 ```json
 {
-  "sticker_number": "ARG-10",
-  "player_name": "Lionel Messi",
-  "country": "Argentina",
-  "position": "Delantero",
+  "sticker_number": "ARG10",
+  "player_name": "Estampilla ARG 10",
+  "country": "ARG",
+  "position": "Seleccion",
   "quantity": 2,
   "notes": "Repetida para intercambio"
 }

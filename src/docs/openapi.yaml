@@ -1,6 +1,540 @@
 openapi: 3.0.0
 info:
   title: World Cup Sticker Tracker API
-  version: 0.1.0
-  description: Documentacion futura de la API REST.
-paths: {}
+  version: 1.0.0
+  description: API REST para gestionar un tracker de estampillas del Mundial.
+servers:
+  - url: http://localhost:3000
+    description: Servidor local de desarrollo
+tags:
+  - name: Health
+    description: Endpoints de prueba del backend
+  - name: Stickers
+    description: Gestion de estampillas del album
+paths:
+  /ping:
+    get:
+      tags:
+        - Health
+      summary: Verifica que la API este activa
+      responses:
+        '200':
+          description: API activa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: pong
+              example:
+                message: pong
+  /ping/db:
+    get:
+      tags:
+        - Health
+      summary: Verifica la conexion con PostgreSQL
+      responses:
+        '200':
+          description: Conexion con base de datos funcionando
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  message:
+                    type: string
+                    example: Database connection is working
+                  databaseTime:
+                    type: string
+                    format: date-time
+                    example: '2026-05-07T18:30:00.000Z'
+              example:
+                status: ok
+                message: Database connection is working
+                databaseTime: '2026-05-07T18:30:00.000Z'
+        '500':
+          description: Error al conectar con la base de datos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Database connection failed
+              example:
+                status: error
+                message: Database connection failed
+  /stickers:
+    get:
+      tags:
+        - Stickers
+      summary: Lista estampillas con busqueda, filtros, ordenamiento y paginacion
+      parameters:
+        - name: q
+          in: query
+          required: false
+          description: Busca coincidencias en sticker_number, player_name, country y position.
+          schema:
+            type: string
+          example: MEX
+        - name: country
+          in: query
+          required: false
+          description: Filtra por seleccion o categoria.
+          schema:
+            type: string
+          example: ARG
+        - name: status
+          in: query
+          required: false
+          description: 'Estado calculado desde quantity: missing = 0, owned >= 1, duplicate > 1.'
+          schema:
+            type: string
+            enum:
+              - missing
+              - owned
+              - duplicate
+          example: owned
+        - name: sort
+          in: query
+          required: false
+          description: Campo usado para ordenar resultados.
+          schema:
+            type: string
+            enum:
+              - id
+              - sticker_number
+              - player_name
+              - country
+              - position
+              - quantity
+              - created_at
+              - updated_at
+            default: id
+          example: sticker_number
+        - name: order
+          in: query
+          required: false
+          description: Direccion del ordenamiento.
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+          example: asc
+        - name: page
+          in: query
+          required: false
+          description: Pagina solicitada. Debe ser un entero positivo.
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          example: 1
+        - name: limit
+          in: query
+          required: false
+          description: Cantidad de resultados por pagina. Maximo 50.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+          example: 10
+      responses:
+        '200':
+          description: Lista paginada de estampillas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Sticker'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  - id: 1
+                    sticker_number: FWC00
+                    player_name: Estampilla FWC 00
+                    country: FWC
+                    position: Especial
+                    quantity: 0
+                    notes: Seccion especial del album
+                    created_at: '2026-05-07T18:30:00.000Z'
+                    updated_at: '2026-05-07T18:30:00.000Z'
+                  - id: 378
+                    sticker_number: ARG03
+                    player_name: Estampilla ARG 03
+                    country: ARG
+                    position: Seleccion
+                    quantity: 1
+                    notes: Estampilla de Argentina
+                    created_at: '2026-05-07T18:30:00.000Z'
+                    updated_at: '2026-05-07T18:30:00.000Z'
+                pagination:
+                  page: 1
+                  limit: 10
+                  total: 980
+                  totalPages: 98
+        '400':
+          description: Parametros de consulta invalidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidStatus:
+                  value:
+                    error: El estado debe ser missing, owned o duplicate
+                invalidLimit:
+                  value:
+                    error: El limite maximo permitido es 50
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Stickers
+      summary: Crea una nueva estampilla
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StickerInput'
+            example:
+              sticker_number: MEX17
+              player_name: Estampilla MEX 17
+              country: MEX
+              position: Seleccion
+              quantity: 1
+              notes: Estampilla de Mexico
+      responses:
+        '201':
+          description: Estampilla creada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Sticker'
+              example:
+                data:
+                  id: 981
+                  sticker_number: MEX17
+                  player_name: Estampilla MEX 17
+                  country: MEX
+                  position: Seleccion
+                  quantity: 1
+                  notes: Estampilla de Mexico
+                  created_at: '2026-05-07T18:30:00.000Z'
+                  updated_at: '2026-05-07T18:30:00.000Z'
+        '400':
+          description: Datos invalidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingStickerNumber:
+                  value:
+                    error: El numero de estampilla es obligatorio
+                missingPlayerName:
+                  value:
+                    error: El nombre del jugador es obligatorio
+                invalidQuantity:
+                  value:
+                    error: La cantidad debe ser un numero entero mayor o igual a 0
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /stickers/stats:
+    get:
+      tags:
+        - Stickers
+      summary: Obtiene estadisticas globales del album
+      description: Devuelve estadisticas de toda la tabla stickers. Las repetidas tambien cuentan como conseguidas porque owned usa quantity >= 1.
+      responses:
+        '200':
+          description: Estadisticas globales
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StickerStats'
+              example:
+                data:
+                  total: 980
+                  owned: 735
+                  missing: 245
+                  duplicate: 245
+                  progress: 75
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /stickers/{id}:
+    get:
+      tags:
+        - Stickers
+      summary: Obtiene una estampilla por id
+      parameters:
+        - $ref: '#/components/parameters/StickerId'
+      responses:
+        '200':
+          description: Estampilla encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Sticker'
+              example:
+                data:
+                  id: 20
+                  sticker_number: FWC19
+                  player_name: Estampilla FWC 19
+                  country: FWC
+                  position: Especial
+                  quantity: 3
+                  notes: Seccion especial del album
+                  created_at: '2026-05-07T18:30:00.000Z'
+                  updated_at: '2026-05-07T18:30:00.000Z'
+        '400':
+          $ref: '#/components/responses/InvalidStickerId'
+        '404':
+          $ref: '#/components/responses/StickerNotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Stickers
+      summary: Actualiza una estampilla por id
+      parameters:
+        - $ref: '#/components/parameters/StickerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StickerInput'
+            example:
+              sticker_number: BRA20
+              player_name: Estampilla BRA 20
+              country: BRA
+              position: Seleccion
+              quantity: 2
+              notes: Repetida para intercambio
+      responses:
+        '200':
+          description: Estampilla actualizada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Sticker'
+              example:
+                data:
+                  id: 300
+                  sticker_number: BRA20
+                  player_name: Estampilla BRA 20
+                  country: BRA
+                  position: Seleccion
+                  quantity: 2
+                  notes: Repetida para intercambio
+                  created_at: '2026-05-07T18:30:00.000Z'
+                  updated_at: '2026-05-07T18:35:00.000Z'
+        '400':
+          description: Id o datos invalidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidId:
+                  value:
+                    error: El id de la estampilla debe ser un numero valido
+                invalidQuantity:
+                  value:
+                    error: La cantidad debe ser un numero entero mayor o igual a 0
+        '404':
+          $ref: '#/components/responses/StickerNotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Stickers
+      summary: Elimina una estampilla por id
+      parameters:
+        - $ref: '#/components/parameters/StickerId'
+      responses:
+        '204':
+          description: Estampilla eliminada correctamente. No devuelve body.
+        '400':
+          $ref: '#/components/responses/InvalidStickerId'
+        '404':
+          $ref: '#/components/responses/StickerNotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  parameters:
+    StickerId:
+      name: id
+      in: path
+      required: true
+      description: Id numerico de la estampilla.
+      schema:
+        type: integer
+        minimum: 1
+      example: 1
+  responses:
+    InvalidStickerId:
+      description: Id invalido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: El id de la estampilla debe ser un numero valido
+    StickerNotFound:
+      description: Estampilla no encontrada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: Estampilla no encontrada
+    InternalServerError:
+      description: Error inesperado del servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: Error interno del servidor
+  schemas:
+    Sticker:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        sticker_number:
+          type: string
+          example: ARG03
+        player_name:
+          type: string
+          example: Estampilla ARG 03
+        country:
+          type: string
+          example: ARG
+        position:
+          type: string
+          nullable: true
+          example: Seleccion
+        quantity:
+          type: integer
+          minimum: 0
+          description: '0 = faltante, 1 = conseguida, mayor a 1 = repetida.'
+          example: 1
+        notes:
+          type: string
+          nullable: true
+          example: Estampilla de Argentina
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-05-07T18:30:00.000Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-05-07T18:30:00.000Z'
+    StickerInput:
+      type: object
+      required:
+        - sticker_number
+        - player_name
+        - country
+      properties:
+        sticker_number:
+          type: string
+          example: MEX17
+        player_name:
+          type: string
+          example: Estampilla MEX 17
+        country:
+          type: string
+          example: MEX
+        position:
+          type: string
+          nullable: true
+          example: Seleccion
+        quantity:
+          type: integer
+          minimum: 0
+          default: 0
+          example: 1
+        notes:
+          type: string
+          nullable: true
+          example: Estampilla de Mexico
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        total:
+          type: integer
+          example: 980
+        totalPages:
+          type: integer
+          example: 98
+    StickerStats:
+      type: object
+      description: Estadisticas globales del album completo.
+      properties:
+        total:
+          type: integer
+          example: 980
+        owned:
+          type: integer
+          description: Cantidad de estampillas con quantity >= 1. Incluye repetidas.
+          example: 735
+        missing:
+          type: integer
+          description: Cantidad de estampillas con quantity = 0.
+          example: 245
+        duplicate:
+          type: integer
+          description: Cantidad de estampillas con quantity > 1.
+          example: 245
+        progress:
+          type: integer
+          description: Porcentaje redondeado de owned sobre total.
+          example: 75
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Error interno del servidor

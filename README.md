@@ -158,6 +158,35 @@ Tambien existe un endpoint para probar la conexion con PostgreSQL:
 GET /ping/db
 ```
 
+## Documentacion de la API
+
+La especificacion OpenAPI esta en `src/docs/openapi.yaml`.
+
+Swagger UI esta disponible en:
+
+```text
+http://localhost:3000/docs
+```
+
+Para usarlo, levanta el backend con:
+
+```bash
+npm run dev
+```
+
+Swagger permite visualizar y probar los endpoints principales de la API:
+
+```http
+GET /ping
+GET /ping/db
+GET /stickers
+GET /stickers/stats
+GET /stickers/:id
+POST /stickers
+PUT /stickers/:id
+DELETE /stickers/:id
+```
+
 ## Endpoints de estampillas disponibles
 
 Actualmente hay endpoints para consultar, crear, editar y eliminar estampillas.

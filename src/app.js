@@ -1,12 +1,18 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 const { testConnection } = require('./db/connection');
 const stickersRoutes = require('./routes/stickers.routes');
 
 const app = express();
+const openApiDocument = YAML.load(path.join(__dirname, 'docs', 'openapi.yaml'));
 
 app.use(cors());
 app.use(express.json());
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 app.use('/stickers', stickersRoutes);
 

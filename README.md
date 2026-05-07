@@ -243,8 +243,10 @@ GET /stickers?page=1&limit=10
 `status` se calcula a partir de `quantity`:
 
 - `missing`: `quantity = 0`
-- `owned`: `quantity = 1`
+- `owned`: `quantity >= 1`
 - `duplicate`: `quantity > 1`
+
+Una estampilla repetida tambien cuenta como conseguida, por lo que aparece en el filtro `owned`.
 
 `sort` y `order` controlan el orden de los resultados.
 

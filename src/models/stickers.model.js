@@ -45,7 +45,7 @@ async function getAllStickers(options = {}) {
   }
 
   if (status === 'owned') {
-    whereConditions.push('quantity = 1');
+    whereConditions.push('quantity >= 1');
   }
 
   if (status === 'duplicate') {

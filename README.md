@@ -14,9 +14,9 @@ La app no usa imagenes reales de jugadores ni de estampillas. Cada registro repr
 
 ## Links del proyecto
 
-- Backend desplegado: [Pendiente de agregar despues del despliegue]
-- Swagger UI desplegado: [Pendiente de agregar despues del despliegue]
-- Frontend desplegado: [Pendiente de agregar despues del despliegue]
+- Backend desplegado: https://proyecto1-world-cup-backend.onrender.com
+- Swagger UI desplegado: https://proyecto1-world-cup-backend.onrender.com/docs
+- Frontend desplegado: https://xpat95.github.io/proyecto1-world-cup-frontend/
 
 ## Tecnologias usadas
 
@@ -226,7 +226,7 @@ Valores permitidos para `order`:
 - `asc`
 - `desc`
 
-## Ejemplos de prueba
+## Ejemplos de prueba local
 
 ```text
 http://localhost:3000/ping
@@ -235,6 +235,18 @@ http://localhost:3000/stickers?q=MEX
 http://localhost:3000/stickers?country=ARG
 http://localhost:3000/stickers?status=owned
 http://localhost:3000/stickers/stats
+```
+
+## Ejemplos de uso publicado
+
+```text
+https://proyecto1-world-cup-backend.onrender.com/ping
+https://proyecto1-world-cup-backend.onrender.com/stickers?limit=20
+https://proyecto1-world-cup-backend.onrender.com/stickers?q=MEX
+https://proyecto1-world-cup-backend.onrender.com/stickers?country=ARG
+https://proyecto1-world-cup-backend.onrender.com/stickers?status=owned
+https://proyecto1-world-cup-backend.onrender.com/stickers/stats
+https://proyecto1-world-cup-backend.onrender.com/docs
 ```
 
 ## OpenAPI y Swagger
@@ -249,6 +261,12 @@ Swagger UI esta disponible localmente en:
 
 ```text
 http://localhost:3000/docs
+```
+
+Swagger UI tambien esta disponible en produccion:
+
+```text
+https://proyecto1-world-cup-backend.onrender.com/docs
 ```
 
 Para usar Swagger UI, levantar el backend con:
@@ -289,6 +307,10 @@ Capturas sugeridas:
 
 ## Notas de entrega
 
-El frontend esta en un repositorio separado y se conectara al backend desplegado cuando ambos servicios esten publicados en linea.
+El frontend esta en un repositorio separado y consume el backend publicado en Render.
 
-Despues del deploy se reemplazaran los placeholders de links por las URLs reales del backend, Swagger UI y frontend.
+La version publicada del proyecto esta disponible en:
+
+```text
+https://xpat95.github.io/proyecto1-world-cup-frontend/
+```

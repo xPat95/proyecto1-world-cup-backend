@@ -1,282 +1,289 @@
 # World Cup Sticker Tracker - Backend
 
-API REST para el tracker de estampillas del Mundial.
+## Descripcion
 
-Este repositorio contendra el backend del proyecto, construido con Node.js, Express y PostgreSQL.
+Este repositorio contiene la API REST del proyecto **World Cup Sticker Tracker**, una aplicacion full stack para llevar control de estampillas del Mundial usando codigos de album.
 
-## Estado actual
+El backend administra las estampillas, la conexion con PostgreSQL, estadisticas globales del album, busqueda, filtros, ordenamiento, paginacion y documentacion de API con OpenAPI y Swagger UI.
 
-El backend ya cuenta con Express, conexion a PostgreSQL usando `pg`, Docker Compose para levantar la base de datos y CRUD completo de estampillas.
+La app no usa imagenes reales de jugadores ni de estampillas. Cada registro representa una estampa mediante codigo, seleccion o categoria, cantidad y estado.
 
-Tambien incluye busqueda, filtros, ordenamiento y paginacion para `GET /stickers`.
+## Repositorios relacionados
 
-## Instalacion
+- Frontend: https://github.com/xPat95/proyecto1-world-cup-frontend.git
 
-```bash
-npm install
-```
+## Links del proyecto
 
-## Modo desarrollo
+- Backend desplegado: [Pendiente de agregar despues del despliegue]
+- Swagger UI desplegado: [Pendiente de agregar despues del despliegue]
+- Frontend desplegado: [Pendiente de agregar despues del despliegue]
 
-```bash
-npm run dev
-```
+## Tecnologias usadas
 
-## Modo produccion
+- Node.js
+- Express
+- PostgreSQL
+- pg
+- dotenv
+- cors
+- Docker
+- OpenAPI
+- Swagger UI
 
-```bash
-npm start
-```
+## Funcionalidades principales
 
-## Base de datos con Docker
+- CRUD completo de estampillas.
+- Busqueda por texto.
+- Filtro por seleccion o categoria.
+- Filtro por estado.
+- Ordenamiento.
+- Paginacion.
+- Estadisticas globales del album.
+- Seed con album completo de 980 estampillas.
+- Documentacion OpenAPI.
+- Swagger UI para visualizar y probar endpoints.
 
-Por ahora Docker se usa solamente para levantar PostgreSQL. El backend todavia se ejecuta localmente con `npm run dev`.
+## Modelo de datos
 
-Levantar PostgreSQL:
+La tabla principal es `stickers`.
 
-```bash
-docker compose up -d
-```
+Campos principales:
 
-Verificar el servicio:
+- `id`: identificador unico.
+- `sticker_number`: codigo de la estampilla, por ejemplo `MEX17`.
+- `player_name`: referencia de la estampilla, por ejemplo `Estampilla MEX 17`.
+- `country`: seleccion o categoria, por ejemplo `MEX`, `ARG` o `FWC`.
+- `position`: tipo de estampilla, por ejemplo `Seleccion` o `Especial`.
+- `quantity`: cantidad disponible.
+- `notes`: notas opcionales.
+- `created_at`: fecha de creacion.
+- `updated_at`: fecha de actualizacion.
 
-```bash
-docker compose ps
-```
+El campo `player_name` se mantiene por compatibilidad con el CRUD, pero funciona como referencia o descripcion de la estampilla.
 
-Detener PostgreSQL:
+## Logica del album
 
-```bash
-docker compose down
-```
+El album usa codigos como identificador principal:
 
-Datos de conexion:
+- `FWC00` a `FWC19` representan la seccion especial del album.
+- Las 48 selecciones tienen codigos del `01` al `20`.
+- El seed genera 20 estampillas FWC y 960 estampillas de selecciones.
+- Total inicial: 980 registros.
 
-- Host: `localhost`
-- Puerto: `5432`
-- Base de datos: `world_cup_stickers`
-- Usuario: `postgres`
-- Contrasena: `postgres`
+Ejemplos de codigos:
 
-## Esquema de base de datos
+- `FWC00`
+- `FWC19`
+- `MEX01`
+- `MEX17`
+- `ARG03`
+- `BRA20`
 
-La tabla principal sera `stickers`. Esta tabla guardara la informacion basica de cada estampilla: numero, nombre, pais, posicion, cantidad y notas.
+## Logica de estados
 
-El campo `quantity` define el estado de la estampilla:
+El estado se calcula a partir de `quantity`:
 
-- `0`: faltante
-- `1`: conseguida
-- Mayor a `1`: repetida
+- `quantity = 0` -> Faltante
+- `quantity = 1` -> Conseguida
+- `quantity > 1` -> Repetida
 
-El script del esquema se encuentra en `src/db/schema.sql`.
+Una estampilla repetida tambien cuenta como conseguida.
 
-Ejecutar el esquema dentro del contenedor de PostgreSQL:
+Para estadisticas:
 
-```bash
-docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/schema.sql
-```
+- Faltantes = `quantity = 0`
+- Conseguidas = `quantity >= 1`
+- Repetidas = `quantity > 1`
+- Progreso = `conseguidas / total * 100`
 
-## Datos iniciales
+## Variables de entorno
 
-El archivo `src/db/seed.sql` contiene datos de prueba para probar el CRUD, los filtros y el render visual por codigos de album.
-
-Este seed reinicia la tabla usando `TRUNCATE`, por lo que elimina los datos actuales de desarrollo antes de insertar los registros iniciales.
-
-Ejecutar base de datos, esquema y seed:
-
-```bash
-docker compose up -d
-docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/schema.sql
-docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/seed.sql
-```
-
-## Datos del album
-
-El album usa codigos de estampilla como identificador principal.
-
-- La seccion especial usa codigos `FWC00` a `FWC19`.
-- Las selecciones usan codigo de tres letras mas numero de dos digitos.
-- Ejemplos: `MEX01`, `ARG10`, `BRA20`.
-- Cada seleccion tiene estampillas del `01` al `20`.
-- El seed genera `20` estampillas FWC y `960` estampillas de selecciones, para un total de `980` registros.
-
-El campo `quantity` define el estado:
-
-- `0`: faltante
-- `1`: conseguida
-- Mayor a `1`: repetida
-
-El campo `player_name` se mantiene por compatibilidad con el CRUD, pero en el seed se usa como referencia generica, por ejemplo `Estampilla MEX 01`.
-
-## Conexion con PostgreSQL
-
-El backend usa `pg` para conectarse a PostgreSQL. Las credenciales se leen desde variables de entorno, por lo que se debe crear un archivo `.env` local basado en `.env.example`.
+Se debe crear un archivo `.env` local basado en `.env.example`.
 
 Ejemplo:
+
+```env
+PORT=3000
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=world_cup_stickers
+DB_USER=postgres
+DB_PASSWORD=postgres
+```
+
+En Windows se puede copiar el archivo de ejemplo con:
 
 ```bash
 copy .env.example .env
 ```
 
-Levantar la base de datos y el backend:
+## Instalacion local
+
+Instalar dependencias:
 
 ```bash
 npm install
+```
+
+## Levantar PostgreSQL con Docker
+
+Levantar la base de datos:
+
+```bash
 docker compose up -d
+```
+
+Verificar el contenedor:
+
+```bash
+docker compose ps
+```
+
+PostgreSQL queda disponible en:
+
+```text
+localhost:5432
+```
+
+## Crear schema y cargar seed
+
+Crear la tabla `stickers`:
+
+```bash
+docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/schema.sql
+```
+
+Cargar datos iniciales:
+
+```bash
+docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/seed.sql
+```
+
+El archivo `seed.sql` reinicia los datos de desarrollo usando `TRUNCATE` y carga 980 estampillas:
+
+- `FWC00` a `FWC19`
+- 48 selecciones x 20 estampillas
+
+## Correr backend localmente
+
+```bash
 npm run dev
 ```
 
-Probar que la API responde:
+El backend corre en:
+
+```text
+http://localhost:3000
+```
+
+## Endpoints principales
+
+- `GET /ping`
+- `GET /ping/db`
+- `GET /stickers`
+- `GET /stickers/stats`
+- `GET /stickers/:id`
+- `POST /stickers`
+- `PUT /stickers/:id`
+- `DELETE /stickers/:id`
+
+## Query params de GET /stickers
+
+`GET /stickers` soporta:
+
+- `q`: busqueda en `sticker_number`, `player_name`, `country` y `position`.
+- `country`: filtro por seleccion o categoria.
+- `status`: filtro por estado.
+- `sort`: campo de ordenamiento.
+- `order`: direccion del ordenamiento.
+- `page`: pagina solicitada.
+- `limit`: cantidad por pagina, maximo 50.
+
+Valores de `status`:
+
+- `missing` -> `quantity = 0`
+- `owned` -> `quantity >= 1`
+- `duplicate` -> `quantity > 1`
+
+Campos permitidos para `sort`:
+
+- `id`
+- `sticker_number`
+- `player_name`
+- `country`
+- `position`
+- `quantity`
+- `created_at`
+- `updated_at`
+
+Valores permitidos para `order`:
+
+- `asc`
+- `desc`
+
+## Ejemplos de prueba
 
 ```text
 http://localhost:3000/ping
+http://localhost:3000/stickers?limit=20
+http://localhost:3000/stickers?q=MEX
+http://localhost:3000/stickers?country=ARG
+http://localhost:3000/stickers?status=owned
+http://localhost:3000/stickers/stats
 ```
 
-Probar la conexion con PostgreSQL:
+## OpenAPI y Swagger
+
+La especificacion OpenAPI esta en:
 
 ```text
-http://localhost:3000/ping/db
+src/docs/openapi.yaml
 ```
 
-## Endpoint disponible
-
-```http
-GET /ping
-```
-
-Respuesta esperada:
-
-```json
-{
-  "message": "pong"
-}
-```
-
-Tambien existe un endpoint para probar la conexion con PostgreSQL:
-
-```http
-GET /ping/db
-```
-
-## Documentacion de la API
-
-La especificacion OpenAPI esta en `src/docs/openapi.yaml`.
-
-Swagger UI esta disponible en:
+Swagger UI esta disponible localmente en:
 
 ```text
 http://localhost:3000/docs
 ```
 
-Para usarlo, levanta el backend con:
+Para usar Swagger UI, levantar el backend con:
 
 ```bash
 npm run dev
 ```
 
-Swagger permite visualizar y probar los endpoints principales de la API:
+## Estructura del proyecto
 
-```http
-GET /ping
-GET /ping/db
-GET /stickers
-GET /stickers/stats
-GET /stickers/:id
-POST /stickers
-PUT /stickers/:id
-DELETE /stickers/:id
+```text
+src/
+  app.js
+  server.js
+  db/
+    connection.js
+    schema.sql
+    seed.sql
+  routes/
+    stickers.routes.js
+  controllers/
+    stickers.controller.js
+  models/
+    stickers.model.js
+  docs/
+    openapi.yaml
 ```
 
-## Endpoints de estampillas disponibles
+## Screenshots
 
-Actualmente hay endpoints para consultar, crear, editar y eliminar estampillas.
+Pendiente de agregar capturas despues de probar la app.
 
-```http
-GET /stickers
-GET /stickers/stats
-GET /stickers/:id
-POST /stickers
-PUT /stickers/:id
-DELETE /stickers/:id
-```
+Capturas sugeridas:
 
-Ejemplo de body JSON para crear una estampilla:
+- Swagger UI.
+- Respuesta de `/stickers`.
+- Respuesta de `/stickers/stats`.
 
-```json
-{
-  "sticker_number": "ARG10",
-  "player_name": "Estampilla ARG 10",
-  "country": "ARG",
-  "position": "Seleccion",
-  "quantity": 1,
-  "notes": "Estampilla de Argentina"
-}
-```
+## Notas de entrega
 
-Ejemplo de body JSON para editar una estampilla:
+El frontend esta en un repositorio separado y se conectara al backend desplegado cuando ambos servicios esten publicados en linea.
 
-```json
-{
-  "sticker_number": "ARG10",
-  "player_name": "Estampilla ARG 10",
-  "country": "ARG",
-  "position": "Seleccion",
-  "quantity": 2,
-  "notes": "Repetida para intercambio"
-}
-```
-
-`PUT /stickers/:id` devuelve `200` con la estampilla actualizada.
-
-`DELETE /stickers/:id` devuelve `204` sin body si la estampilla se elimina correctamente.
-
-Si la estampilla no existe, `PUT /stickers/:id` y `DELETE /stickers/:id` devuelven `404`.
-
-El campo `quantity` define el estado visual de la estampilla:
-
-- `0`: faltante
-- `1`: conseguida
-- Mayor a `1`: repetida
-
-`GET /stickers/stats` devuelve las estadisticas globales del album completo y no depende de la pagina actual, busqueda ni filtros usados en `GET /stickers`.
-
-Para estas estadisticas:
-
-- Conseguidas = `quantity >= 1`
-- Faltantes = `quantity = 0`
-- Repetidas = `quantity > 1`
-- Las repetidas tambien cuentan como conseguidas.
-
-Para consultar datos, primero debe existir la tabla `stickers` en PostgreSQL. Puedes cargar datos de prueba con `src/db/seed.sql`.
-
-## Busqueda, filtros, ordenamiento y paginacion
-
-`GET /stickers` soporta parametros para buscar, filtrar, ordenar y paginar resultados.
-
-Ejemplos:
-
-```http
-GET /stickers?q=messi
-GET /stickers?country=Argentina
-GET /stickers?status=missing
-GET /stickers?status=owned
-GET /stickers?status=duplicate
-GET /stickers?sort=player_name&order=asc
-GET /stickers?page=1&limit=10
-```
-
-`q` busca coincidencias en numero de estampilla, jugador, pais y posicion.
-
-`country` filtra por pais o seleccion.
-
-`status` se calcula a partir de `quantity`:
-
-- `missing`: `quantity = 0`
-- `owned`: `quantity >= 1`
-- `duplicate`: `quantity > 1`
-
-Una estampilla repetida tambien cuenta como conseguida, por lo que aparece en el filtro `owned`.
-
-`sort` y `order` controlan el orden de los resultados.
-
-`page` y `limit` controlan la paginacion.
+Despues del deploy se reemplazaran los placeholders de links por las URLs reales del backend, Swagger UI y frontend.

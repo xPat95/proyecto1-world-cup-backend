@@ -104,12 +104,17 @@ Ejemplo:
 
 ```env
 PORT=3000
+DATABASE_URL=
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=world_cup_stickers
 DB_USER=postgres
 DB_PASSWORD=postgres
 ```
+
+En desarrollo local, si `DATABASE_URL` esta vacia, el backend usa `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` y `DB_PASSWORD`.
+
+En produccion, si existe `DATABASE_URL`, el backend usa esa cadena de conexion para PostgreSQL y habilita SSL. En Render se debe configurar `DATABASE_URL` con la **Internal Database URL** de la base de datos PostgreSQL.
 
 En Windows se puede copiar el archivo de ejemplo con:
 

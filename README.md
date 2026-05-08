@@ -1,24 +1,34 @@
 # World Cup Sticker Tracker - Backend
 
-## Descripcion
+## Descripción
 
-Este repositorio contiene la API REST del proyecto **World Cup Sticker Tracker**, una aplicacion full stack para llevar control de estampillas del Mundial usando codigos de album.
+Este repositorio contiene la API REST del proyecto **World Cup Sticker Tracker**, una aplicación full stack para llevar control de estampillas del Mundial usando códigos de álbum.
 
-El backend administra las estampillas, la conexion con PostgreSQL, estadisticas globales del album, busqueda, filtros, ordenamiento, paginacion y documentacion de API con OpenAPI y Swagger UI.
+El backend administra las estampillas, la conexión con PostgreSQL, las estadísticas globales del álbum, búsqueda, filtros, ordenamiento, paginación y documentación de API con OpenAPI y Swagger UI.
 
-La app no usa imagenes reales de jugadores ni de estampillas. Cada registro representa una estampa mediante codigo, seleccion o categoria, cantidad y estado.
+La API responde únicamente en formato JSON. El servidor no genera HTML y funciona como un backend HTTP independiente que puede ser consumido por cualquier cliente.
 
-## Repositorios relacionados
+La app no usa imágenes reales de jugadores ni de estampillas. Cada registro representa una estampa mediante código, selección o categoría, cantidad y estado.
 
-- Frontend: https://github.com/xPat95/proyecto1-world-cup-frontend.git
+---
 
 ## Links del proyecto
 
-- Backend desplegado: https://proyecto1-world-cup-backend.onrender.com
-- Swagger UI desplegado: https://proyecto1-world-cup-backend.onrender.com/docs
-- Frontend desplegado: https://xpat95.github.io/proyecto1-world-cup-frontend/
+- **Backend desplegado:**  
+  https://proyecto1-world-cup-backend.onrender.com
 
-## Tecnologias usadas
+- **Swagger UI desplegado:**  
+  https://proyecto1-world-cup-backend.onrender.com/docs
+
+- **Frontend desplegado:**  
+  https://xpat95.github.io/proyecto1-world-cup-frontend/
+
+- **Repositorio frontend:**  
+  https://github.com/xPat95/proyecto1-world-cup-frontend.git
+
+---
+
+## Tecnologías usadas
 
 - Node.js
 - Express
@@ -30,18 +40,50 @@ La app no usa imagenes reales de jugadores ni de estampillas. Cada registro repr
 - OpenAPI
 - Swagger UI
 
+---
+
 ## Funcionalidades principales
 
 - CRUD completo de estampillas.
-- Busqueda por texto.
-- Filtro por seleccion o categoria.
+- Búsqueda por texto.
+- Filtro por selección o categoría.
 - Filtro por estado.
 - Ordenamiento.
-- Paginacion.
-- Estadisticas globales del album.
-- Seed con album completo de 980 estampillas.
-- Documentacion OpenAPI.
+- Paginación.
+- Estadísticas globales del álbum.
+- Seed con álbum completo de 980 estampillas.
+- Documentación OpenAPI.
 - Swagger UI para visualizar y probar endpoints.
+- CORS configurado para permitir consumo desde el frontend.
+- Validaciones server-side con respuestas JSON descriptivas.
+
+---
+
+## Cumplimiento de requisitos
+
+| Requisito | Estado |
+|---|---|
+| Backend HTTP independiente | Cumplido |
+| Backend responde JSON | Cumplido |
+| Backend no genera HTML | Cumplido |
+| API REST | Cumplido |
+| CRUD completo | Cumplido |
+| Cliente separado del servidor | Cumplido |
+| Persistencia en base de datos real | Cumplido |
+| PostgreSQL como DBMS | Cumplido |
+| CORS configurado | Cumplido |
+| Dos repositorios separados | Cumplido |
+| OpenAPI escrito | Cumplido |
+| Swagger UI servido desde el backend | Cumplido |
+| Códigos HTTP correctos | Cumplido |
+| Validaciones server-side | Cumplido |
+| Búsqueda con `q` | Cumplido |
+| Paginación con `page` y `limit` | Cumplido |
+| Ordenamiento con `sort` y `order` | Cumplido |
+| Proyecto publicado en internet | Cumplido |
+| README con instrucciones claras | Cumplido |
+
+---
 
 ## Modelo de datos
 
@@ -49,28 +91,30 @@ La tabla principal es `stickers`.
 
 Campos principales:
 
-- `id`: identificador unico.
-- `sticker_number`: codigo de la estampilla, por ejemplo `MEX17`.
+- `id`: identificador único.
+- `sticker_number`: código de la estampilla, por ejemplo `MEX17`.
 - `player_name`: referencia de la estampilla, por ejemplo `Estampilla MEX 17`.
-- `country`: seleccion o categoria, por ejemplo `MEX`, `ARG` o `FWC`.
-- `position`: tipo de estampilla, por ejemplo `Seleccion` o `Especial`.
+- `country`: selección o categoría, por ejemplo `MEX`, `ARG` o `FWC`.
+- `position`: tipo de estampilla, por ejemplo `Selección` o `Especial`.
 - `quantity`: cantidad disponible.
 - `notes`: notas opcionales.
-- `created_at`: fecha de creacion.
-- `updated_at`: fecha de actualizacion.
+- `created_at`: fecha de creación.
+- `updated_at`: fecha de actualización.
 
-El campo `player_name` se mantiene por compatibilidad con el CRUD, pero funciona como referencia o descripcion de la estampilla.
+El campo `player_name` se mantiene por compatibilidad con el CRUD, pero funciona como referencia o descripción de la estampilla.
 
-## Logica del album
+---
 
-El album usa codigos como identificador principal:
+## Lógica del álbum
 
-- `FWC00` a `FWC19` representan la seccion especial del album.
-- Las 48 selecciones tienen codigos del `01` al `20`.
+El álbum usa códigos como identificador principal:
+
+- `FWC00` a `FWC19` representan la sección especial del álbum.
+- Las 48 selecciones tienen códigos del `01` al `20`.
 - El seed genera 20 estampillas FWC y 960 estampillas de selecciones.
 - Total inicial: 980 registros.
 
-Ejemplos de codigos:
+Ejemplos de códigos:
 
 - `FWC00`
 - `FWC19`
@@ -79,22 +123,26 @@ Ejemplos de codigos:
 - `ARG03`
 - `BRA20`
 
-## Logica de estados
+---
+
+## Lógica de estados
 
 El estado se calcula a partir de `quantity`:
 
-- `quantity = 0` -> Faltante
-- `quantity = 1` -> Conseguida
-- `quantity > 1` -> Repetida
+- `quantity = 0` → Faltante
+- `quantity = 1` → Conseguida
+- `quantity > 1` → Repetida
 
-Una estampilla repetida tambien cuenta como conseguida.
+Una estampilla repetida también cuenta como conseguida.
 
-Para estadisticas:
+Para estadísticas:
 
 - Faltantes = `quantity = 0`
 - Conseguidas = `quantity >= 1`
 - Repetidas = `quantity > 1`
 - Progreso = `conseguidas / total * 100`
+
+---
 
 ## Variables de entorno
 
@@ -110,207 +158,3 @@ DB_PORT=5432
 DB_NAME=world_cup_stickers
 DB_USER=postgres
 DB_PASSWORD=postgres
-```
-
-En desarrollo local, si `DATABASE_URL` esta vacia, el backend usa `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` y `DB_PASSWORD`.
-
-En produccion, si existe `DATABASE_URL`, el backend usa esa cadena de conexion para PostgreSQL y habilita SSL. En Render se debe configurar `DATABASE_URL` con la **Internal Database URL** de la base de datos PostgreSQL.
-
-En Windows se puede copiar el archivo de ejemplo con:
-
-```bash
-copy .env.example .env
-```
-
-## Instalacion local
-
-Instalar dependencias:
-
-```bash
-npm install
-```
-
-## Levantar PostgreSQL con Docker
-
-Levantar la base de datos:
-
-```bash
-docker compose up -d
-```
-
-Verificar el contenedor:
-
-```bash
-docker compose ps
-```
-
-PostgreSQL queda disponible en:
-
-```text
-localhost:5432
-```
-
-## Crear schema y cargar seed
-
-Crear la tabla `stickers`:
-
-```bash
-docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/schema.sql
-```
-
-Cargar datos iniciales:
-
-```bash
-docker exec -i world-cup-stickers-db psql -U postgres -d world_cup_stickers < src/db/seed.sql
-```
-
-El archivo `seed.sql` reinicia los datos de desarrollo usando `TRUNCATE` y carga 980 estampillas:
-
-- `FWC00` a `FWC19`
-- 48 selecciones x 20 estampillas
-
-## Correr backend localmente
-
-```bash
-npm run dev
-```
-
-El backend corre en:
-
-```text
-http://localhost:3000
-```
-
-## Endpoints principales
-
-- `GET /ping`
-- `GET /ping/db`
-- `GET /stickers`
-- `GET /stickers/stats`
-- `GET /stickers/:id`
-- `POST /stickers`
-- `PUT /stickers/:id`
-- `DELETE /stickers/:id`
-
-## Query params de GET /stickers
-
-`GET /stickers` soporta:
-
-- `q`: busqueda en `sticker_number`, `player_name`, `country` y `position`.
-- `country`: filtro por seleccion o categoria.
-- `status`: filtro por estado.
-- `sort`: campo de ordenamiento.
-- `order`: direccion del ordenamiento.
-- `page`: pagina solicitada.
-- `limit`: cantidad por pagina, maximo 50.
-
-Valores de `status`:
-
-- `missing` -> `quantity = 0`
-- `owned` -> `quantity >= 1`
-- `duplicate` -> `quantity > 1`
-
-Campos permitidos para `sort`:
-
-- `id`
-- `sticker_number`
-- `player_name`
-- `country`
-- `position`
-- `quantity`
-- `created_at`
-- `updated_at`
-
-Valores permitidos para `order`:
-
-- `asc`
-- `desc`
-
-## Ejemplos de prueba local
-
-```text
-http://localhost:3000/ping
-http://localhost:3000/stickers?limit=20
-http://localhost:3000/stickers?q=MEX
-http://localhost:3000/stickers?country=ARG
-http://localhost:3000/stickers?status=owned
-http://localhost:3000/stickers/stats
-```
-
-## Ejemplos de uso publicado
-
-```text
-https://proyecto1-world-cup-backend.onrender.com/ping
-https://proyecto1-world-cup-backend.onrender.com/stickers?limit=20
-https://proyecto1-world-cup-backend.onrender.com/stickers?q=MEX
-https://proyecto1-world-cup-backend.onrender.com/stickers?country=ARG
-https://proyecto1-world-cup-backend.onrender.com/stickers?status=owned
-https://proyecto1-world-cup-backend.onrender.com/stickers/stats
-https://proyecto1-world-cup-backend.onrender.com/docs
-```
-
-## OpenAPI y Swagger
-
-La especificacion OpenAPI esta en:
-
-```text
-src/docs/openapi.yaml
-```
-
-Swagger UI esta disponible localmente en:
-
-```text
-http://localhost:3000/docs
-```
-
-Swagger UI tambien esta disponible en produccion:
-
-```text
-https://proyecto1-world-cup-backend.onrender.com/docs
-```
-
-Para usar Swagger UI, levantar el backend con:
-
-```bash
-npm run dev
-```
-
-## Estructura del proyecto
-
-```text
-src/
-  app.js
-  server.js
-  db/
-    connection.js
-    schema.sql
-    seed.sql
-  routes/
-    stickers.routes.js
-  controllers/
-    stickers.controller.js
-  models/
-    stickers.model.js
-  docs/
-    openapi.yaml
-```
-
-## Screenshots
-
-Pendiente de agregar capturas despues de probar la app.
-
-Capturas sugeridas:
-
-- Swagger UI.
-- Respuesta de `/stickers`.
-- Respuesta de `/stickers/stats`.
-
-## Notas de entrega
-
-El frontend esta en un repositorio separado y consume el backend publicado en Render.
-
-La version publicada del proyecto esta disponible en:
-
-```text
-https://xpat95.github.io/proyecto1-world-cup-frontend/
-```
